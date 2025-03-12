@@ -8280,19 +8280,22 @@
       browser5.windows.onFocusChanged.addListener(runUpdate);
       browser5.windows.onCreated.addListener(runUpdate);
       browser5.windows.onRemoved.addListener(runUpdate);
-      browser5.runtime.onMessage.addListener(async function(message, sender, sendResponse) {
-        const request = message;
-        console.log(request.command);
-        switch (request.command) {
-          case refresh_windows:
-            let window_ids = request.window_ids;
-            for (let window_id of window_ids) {
-              if (!_this.refs["window" + window_id]) continue;
-              _this.refs["window" + window_id].checkSettings();
-            }
-            break;
+      browser5.runtime.onMessage.addListener(
+        function(message, sender, sendResponse) {
+          const request = message;
+          console.log(request.command);
+          switch (request.command) {
+            case refresh_windows:
+              let window_ids = request.window_ids;
+              for (let window_id of window_ids) {
+                if (!_this.refs["window" + window_id]) continue;
+                _this.refs["window" + window_id].forceUpdate();
+              }
+              break;
+          }
+          return true;
         }
-      });
+      );
       browser5.storage.onChanged.addListener(this.sessionSync);
       await this.sessionSync();
       this.refs.root.focus();
@@ -8523,13 +8526,15 @@
       let hiddenCount = this.state.hiddenCount || 0;
       const idList = [...this.state.tabsbyid.keys()];
       const dup = [];
-      for (const id of idList) {
+      for (let i = 0; i < idList.length; i++) {
+        const id = idList[i];
         var tab = this.state.tabsbyid.get(id);
-        for (const id2 of idList) {
+        for (let j = i + 1; j < idList.length; j++) {
+          const id2 = idList[j];
           if (id === id2) continue;
           var tab2 = this.state.tabsbyid.get(id2);
-          if (tab.url === tab2.url) {
-            dup.push(id);
+          if (tab.url == tab2.url) {
+            dup.push(id2);
             break;
           }
         }

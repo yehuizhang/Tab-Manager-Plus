@@ -1638,7 +1638,7 @@
 
   // src/service_worker/background/actions.ts
   var browser6 = __toESM(require_browser_polyfill());
-  async function handleMessages(message, sender, sendResponse) {
+  function handleMessages(message, sender, sendResponse) {
     const request = message;
     switch (request.command) {
       case reload_popup_controls:
@@ -1657,14 +1657,23 @@
         if (!!request.tab) {
           focusOnTabAndWindow(request.tab.id, request.tab.windowId);
         } else {
-          focusOnTabAndWindow(request.saved_tab.tabId, request.saved_tab.windowId);
+          focusOnTabAndWindow(
+            request.saved_tab.tabId,
+            request.saved_tab.windowId
+          );
         }
         break;
       case focus_on_tab_and_window_delayed:
         if (!!request.tab) {
-          focusOnTabAndWindowDelayed(request.tab.id, request.tab.windowId);
+          focusOnTabAndWindowDelayed(
+            request.tab.id,
+            request.tab.windowId
+          );
         } else {
-          focusOnTabAndWindowDelayed(request.saved_tab.tabId, request.saved_tab.windowId);
+          focusOnTabAndWindowDelayed(
+            request.saved_tab.tabId,
+            request.saved_tab.windowId
+          );
         }
         break;
       case focus_on_window:
@@ -1689,6 +1698,7 @@
         closeTabs(request.tabs);
         break;
     }
+    return true;
   }
   function handleCommands(command) {
     if (command === switch_to_previous_active_tab) {

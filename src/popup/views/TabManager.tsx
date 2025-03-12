@@ -603,20 +603,25 @@ export class TabManager extends React.Component<ITabManager, ITabManagerState> {
 		browser.windows.onCreated.addListener(runUpdate);
 		browser.windows.onRemoved.addListener(runUpdate);
 
-		browser.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
-			const request = message as ICommand;
+		browser.runtime.onMessage.addListener(
+			function (message, sender, sendResponse) {
+				const request = message as ICommand;
 
-			console.log(request.command);
-			switch (request.command) {
-				case S.refresh_windows:
-					let window_ids : number[] = request.window_ids;
-					for (let window_id of window_ids) {
-						if (!_this.refs["window" + window_id]) continue;
-						(_this.refs["window" + window_id] as Window).checkSettings();
-					}
-					break;
+				console.log(request.command);
+				switch (request.command) {
+					case S.refresh_windows:
+						let window_ids: number[] = request.window_ids;
+						for (let window_id of window_ids) {
+							if (!_this.refs["window" + window_id]) continue;
+							(
+								_this.refs["window" + window_id] as Window
+							).forceUpdate();
+						}
+						break;
+				}
+				return true; // Return true to indicate that the response will be sent asynchronously
 			}
-		});
+		);
 
 
 		browser.storage.onChanged.addListener(this.sessionSync);
@@ -877,13 +882,15 @@ export class TabManager extends React.Component<ITabManager, ITabManagerState> {
 		let hiddenCount = this.state.hiddenCount || 0;
 		const idList : number[] = [...this.state.tabsbyid.keys()];
 		const dup = [];
-		for (const id of idList) {
+		for (let i = 0; i < idList.length; i++) {
+			const id = idList[i];
 			var tab = this.state.tabsbyid.get(id);
-			for (const id2 of idList) {
+			for (let j = i + 1; j < idList.length; j++) {
+				const id2 = idList[j];
 				if (id === id2) continue;
 				var tab2 = this.state.tabsbyid.get(id2);
 				if (tab.url === tab2.url) {
-					dup.push(id);
+					dup.push(id2);
 					break;
 				}
 			}

@@ -9,7 +9,7 @@ import { updateTabCount, discardTabs, moveTabsToWindow, closeTabs, focusOnTabAnd
 import * as browser from 'webextension-polyfill';
 import { ICommand } from '@types';
 
-export async function handleMessages(message, sender, sendResponse) {
+export function handleMessages(message, sender, sendResponse): true {
 	const request = message as ICommand;
 
 	switch (request.command) {
@@ -29,14 +29,23 @@ export async function handleMessages(message, sender, sendResponse) {
 			if (!!request.tab) {
 				focusOnTabAndWindow(request.tab.id, request.tab.windowId);
 			} else {
-				focusOnTabAndWindow(request.saved_tab.tabId, request.saved_tab.windowId);
+				focusOnTabAndWindow(
+					request.saved_tab.tabId,
+					request.saved_tab.windowId
+				);
 			}
 			break;
 		case S.focus_on_tab_and_window_delayed:
 			if (!!request.tab) {
-				focusOnTabAndWindowDelayed(request.tab.id, request.tab.windowId);
+				focusOnTabAndWindowDelayed(
+					request.tab.id,
+					request.tab.windowId
+				);
 			} else {
-				focusOnTabAndWindowDelayed(request.saved_tab.tabId, request.saved_tab.windowId);
+				focusOnTabAndWindowDelayed(
+					request.saved_tab.tabId,
+					request.saved_tab.windowId
+				);
 			}
 			break;
 		case S.focus_on_window:
@@ -61,6 +70,8 @@ export async function handleMessages(message, sender, sendResponse) {
 			closeTabs(request.tabs);
 			break;
 	}
+
+	return true; // Return true to indicate that the response will be sent asynchronously
 }
 
 export function handleCommands(command : string) {
